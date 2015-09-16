@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Applewatch | 往事随风]]></title>
   <link href="http://wrlqwe.github.io/blog/categories/applewatch/atom.xml" rel="self"/>
   <link href="http://wrlqwe.github.io/"/>
-  <updated>2015-09-17T03:23:10+08:00</updated>
+  <updated>2015-09-17T03:33:49+08:00</updated>
   <id>http://wrlqwe.github.io/</id>
   <author>
     <name><![CDATA[王儒林]]></name>
@@ -157,59 +157,99 @@ func invalidateUserActivity()
 
 <p>是UI元素的父类，Button、Label和Image这些类都是它的子类。WKInterfaceObject在功能和用法上有点像UIKit中的UIView，但是它并不是直接显示在Watch上的View，因为代码的逻辑是运行在iOS上的，WKInterfaceObject只是watch app在WatchKit Extension上的代理对象。
 在WatchKit 1.0它只有5个API：
-```
-func setHidden(hidden: Bool)
-func setAlpha(alpha: CGFloat)
-func setWidth(width: CGFloat)
-func setHeight(height: CGFloat)</p>
-
-<p>var interfaceProperty: String { get }
-```
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>func setHidden(hidden: Bool)
+</span><span class='line'>func setAlpha(alpha: CGFloat)
+</span><span class='line'>func setWidth(width: CGFloat)
+</span><span class='line'>func setHeight(height: CGFloat)&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;var interfaceProperty: String { get }</span></code></pre></td></tr></table></div></figure>
 可见它不支持操作添加删除子元素（只能用storyboard了），不如UIView灵活。</p>
 
 <h4><h3 id="4.2.3">WKInterfaceTable</h3></h4>
 
 <p>WKInterfaceTable相当于UIKit的UITableView，在WatchOS1.0上，AppleWatch的逻辑代码执行在iPhone上，要以delegate方式交互数据受蓝牙传输的限制，并不现实，要对它进行配置，只能靠初始化时调用代码设置：
-```
-//  MyRowController.swift
-import Foundation<br/>
-import WatchKit</p>
-
-<p>class MyRowController: NSObject {<br/>
-    @IBOutlet weak var label: WKInterfaceLabel!
-}</p>
-
-<p>//  InterfaceController.swift
-import WatchKit<br/>
-import Foundation</p>
-
-<p>class InterfaceController: WKInterfaceController {</p>
-
-<pre><code>let tableDataSource :[[String:String]] = [
-    ["title":"title0","description":"description0"],
-    ["title":"title1","description":"description1"],
-    ["title":"title2","description":"description2"],
-    ["title":"title3","description":"description3"],
-    ["title":"title4","description":"description4"],
-    ["title":"title5","description":"description5"],
-
-]
-@IBOutlet weak var table: WKInterfaceTable!
-
-override awakeWithContext(context: AnyObject?) {
-    super.awakeWithContext(context: context)
-
-    table.setNumberOfRows(data.count, withRowType: "MyRowController")
-    for (i, value) in enumerate(tableDataSource) {
-        if let rowController = table.rowControllerAtIndex(i) as? MyRowController {
-            rowController.info = value
-        }
-    }
-}
-</code></pre>
-
-<p>}
-```</p>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>//  MyRowController.swift
+</span><span class='line'>import Foundation&lt;br/&gt;
+</span><span class='line'>import WatchKit&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;class MyRowController: NSObject {&lt;br/&gt;
+</span><span class='line'>    @IBOutlet weak var label: WKInterfaceLabel!
+</span><span class='line'>}&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;//  InterfaceController.swift
+</span><span class='line'>import WatchKit&lt;br/&gt;
+</span><span class='line'>import Foundation&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;class InterfaceController: WKInterfaceController {&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;let tableDataSource :[[String:String]] = [
+</span><span class='line'>    ["title":"title0","description":"description0"],
+</span><span class='line'>    ["title":"title1","description":"description1"],
+</span><span class='line'>    ["title":"title2","description":"description2"],
+</span><span class='line'>    ["title":"title3","description":"description3"],
+</span><span class='line'>    ["title":"title4","description":"description4"],
+</span><span class='line'>    ["title":"title5","description":"description5"],
+</span><span class='line'>
+</span><span class='line'>]
+</span><span class='line'>@IBOutlet weak var table: WKInterfaceTable!
+</span><span class='line'>
+</span><span class='line'>override awakeWithContext(context: AnyObject?) {
+</span><span class='line'>    super.awakeWithContext(context: context)
+</span><span class='line'>
+</span><span class='line'>    table.setNumberOfRows(data.count, withRowType: "MyRowController")
+</span><span class='line'>    for (i, value) in enumerate(tableDataSource) {
+</span><span class='line'>        if let rowController = table.rowControllerAtIndex(i) as? MyRowController {
+</span><span class='line'>            rowController.info = value
+</span><span class='line'>        }
+</span><span class='line'>    }
+</span><span class='line'>}
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;}</span></code></pre></td></tr></table></div></figure></p>
 
 <h4><h3 id="4.2.4">WKInterfaceGroup</h3></h4>
 

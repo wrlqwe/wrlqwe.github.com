@@ -210,6 +210,18 @@
 扩展NSLog()的功能，以使它能打印出更多信息，确定文件行号方法等</p></blockquote>
 
 <p>首先我们要知道，在预编译时，编译器为我们指定了一些内置的宏(_<em>FILE__，_</em>func<strong>，__LINE</strong>)，分别对应文件、方法和行号，像NSLog这种应用广泛的宏，最好能少改动其他文件的代码部分。那么，最终只要在项目的预编译pch文件里加上下面的代码：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#define NSLog(format, ...) do{                                              \
+</span><span class='line'>    fprintf(stderr, "&lt;%s : %d&gt; %s\n", [[[NSString stringWithUTF8String:__FILE__] lastPathComponent] UTF8String], __LINE__, __func__);                                                              \
+</span><span class='line'>    NSLog((format), ##__VA_ARGS__);                                         \
+</span><span class='line'>    fprintf(stderr,"-------\n");                                            \
+</span><span class='line'>    } while (0)</span></code></pre></td></tr></table></div></figure>
+
 </div>
   
   

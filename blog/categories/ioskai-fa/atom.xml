@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ios开发 | 往事随风]]></title>
   <link href="http://wrlqwe.github.io/blog/categories/ioskai-fa/atom.xml" rel="self"/>
   <link href="http://wrlqwe.github.io/"/>
-  <updated>2015-09-17T03:23:10+08:00</updated>
+  <updated>2015-09-17T03:33:49+08:00</updated>
   <id>http://wrlqwe.github.io/</id>
   <author>
     <name><![CDATA[王儒林]]></name>
@@ -118,17 +118,15 @@ else
 首先我们要知道，在预编译时，编译器为我们指定了一些内置的宏(\__FILE__，\__func__，\__LINE__)，分别对应文件、方法和行号，像NSLog这种应用广泛的宏，最好能少改动其他文件的代码部分。那么，最终只要在项目的预编译pch文件里加上下面的代码：
 </code></pre>
 
-<h1>define NSLog(format, &hellip;) do {                                                                             \</h1>
+<h1>define NSLog(format, &hellip;) do{                                              \</h1>
 
-<pre><code>fprintf(stderr, "&lt;%s : %d&gt; %s\n",                                                                    \
-        [[[NSString stringWithUTF8String:__FILE__] lastPathComponent] UTF8String],                                                      \
-        __LINE__, __func__);                                                        \
-NSLog((format), ##__VA_ARGS__);                                           \
-fprintf(stderr,"-------\n");                                              \
+<pre><code>fprintf(stderr, "&lt;%s : %d&gt; %s\n", [[[NSString stringWithUTF8String:__FILE__] lastPathComponent] UTF8String], __LINE__, __func__);                                                              \
+NSLog((format), ##__VA_ARGS__);                                         \
+fprintf(stderr,"-------\n");                                            \
+} while (0)
 </code></pre>
 
-<p>} while (0)
-```</p>
+<p>```</p>
 ]]></content>
   </entry>
   
