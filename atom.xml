@@ -4,7 +4,7 @@
   <title><![CDATA[往事随风]]></title>
   <link href="http://wrlqwe.github.io/atom.xml" rel="self"/>
   <link href="http://wrlqwe.github.io/"/>
-  <updated>2015-09-17T03:33:49+08:00</updated>
+  <updated>2015-09-17T03:35:22+08:00</updated>
   <id>http://wrlqwe.github.io/</id>
   <author>
     <name><![CDATA[王儒林]]></name>
@@ -12,149 +12,6 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
-  
-  <entry>
-    <title type="html"><![CDATA[IOS开发中宏的应用]]></title>
-    <link href="http://wrlqwe.github.io/blog/2015/09/17/IOS%E5%BC%80%E5%8F%91%E4%B8%AD%E5%AE%8F%E7%9A%84%E5%BA%94%E7%94%A8/"/>
-    <updated>2015-09-17T03:05:39+08:00</updated>
-    <id>http://wrlqwe.github.io/blog/2015/09/17/IOS开发中宏的应用</id>
-    <content type="html"><![CDATA[<h2>什么是宏</h2>
-
-<p>宏(#define)是一种抽象（Abstraction），它根据一系列预定义的规则替换一定的文本模式。一个标识符被宏定义后，该标识符便是一个宏名。这时，在程序中出现的是宏名，对于编译语言，在该程序被编译前，先将宏名用被定义的字符串替换，这称为宏替换，替换后才进行编译，宏替换是简单的替换。</p>
-
-<h2>为什么要用到宏定义</h2>
-
-<p>例如，在开发中，当我们在很多地方要用到同一个数值是，肯定不能直接使用字面值，因为这样会使代码变的不可维护，所以我们经常要这样做：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>#define PI 3.1415926535897932</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这样，如果我们要修改PI的精度，直接修改宏就可以了。</p>
-
-<p>我们要针对编译环境进行优化，要这样做：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>#ifdef DEBUG
-</span><span class='line'>    NSLog(@"test");
-</span><span class='line'>#endif</span></code></pre></td></tr></table></div></figure>
-
-
-<p>通过这个，我们可以只在DEBUG环境下输出log。</p>
-
-<p><strong>宏定义在C系开发中可以说占有举足轻重的作用，通过使用宏定义，我们可以实现灵活的编程，提高开发和执行效率。为了编译优化和方便，以及跨平台能力，宏被大量使用。</strong></p>
-
-<h2>如何使用？</h2>
-
-<p>宏在预编译时展开，替换成它的本体。只要我们了解到它的这个原理，就能拓展出不同的用法。
-上面两个例子只是简单的使用，它能满足我们特定的需求。
-宏在预编译时展开，替换成它的本体。只要我们围绕它的这个原理，就能拓展出不同的用法，写出更灵活的代码，实现神奇的功能；</p>
-
-<h3>几个概念：</h3>
-
-<ol>
-<li><p>对象宏和函数宏</p>
-
-<blockquote><p>分别指定义常量的宏和可以传参数的宏</p></blockquote></li>
-<li><p>使用"\&ldquo;来确保多行代码宏定义可读性</p>
-
-<blockquote><p>![宏换行][1]</p></blockquote></li>
-<li><p>#与##操作符</p>
-
-<blockquote><p>#的功能是将其后面的宏参数进行字符串化操作，意思就是对它所应用的宏变量通过替换后在其左右各加上一个双引号。##操作符有两种作用：1是可以把两个参数字符串拼接在一起，2是当##放在可变参数前时(##__VA_ARGS__)，在可变参数数量为0时，去掉前面的逗号，防止编译器报错。</p></blockquote></li>
-<li><p>可变参数"&hellip;"</p>
-
-<blockquote><p>用作函数宏中，允许传0个以上的参数，以逗号分隔。</p></blockquote></li>
-</ol>
-
-
-<h3>坑在哪？如何处理？</h3>
-
-<blockquote><p>大部分坑都源人们使用它的时候忽略了它的展开过程，大部分是可以通过编写更严谨的宏和更多的使用括号来避免的。</p></blockquote>
-
-<ul>
-<li>例如，计算两数的和</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>#define SUM(a,b) a + b</span></code></pre></td></tr></table></div></figure>
-
-
-<p>在与乘法配合时出现了问题</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>int x = 3 * SUM(2,1);</span></code></pre></td></tr></table></div></figure>
-
-
-<p>它的结果是 x = 3 * 2 + 1，显然不是我们预期的，这种情况我们一般不能吝啬括号</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>#define SUM(a,b) (a + b)</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>还有一种常见情况，一个宏执行多个语句</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>#define WARN_AND_LOG() warn(); log();</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这种语句在碰到条件语句的时候容易出错：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>if (flag)
-</span><span class='line'>    WARN_AND_LOG()
-</span><span class='line'>else
-</span><span class='line'>    //do sth. else</span></code></pre></td></tr></table></div></figure>
-
-
-<p>它的展开是</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>if (flag)
-</span><span class='line'>    warn(); log();
-</span><span class='line'>else
-</span><span class='line'>    //do sth. else</span></code></pre></td></tr></table></div></figure>
-
-
-<p>条件控制完全失效了
-这种情况一般使用 do while 语句，防止出现意料之外的问题</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>#define WARN_AND_LOG() do { warn(); log();} while(0)</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>实例，通过宏来实现灵活的代码</h3>
-
-<blockquote><p>需求
-扩展NSLog()的功能，以使它能打印出更多信息，确定文件行号方法等</p></blockquote>
-
-<p>首先我们要知道，在预编译时，编译器为我们指定了一些内置的宏(_<em>FILE__，_</em>func<strong>，__LINE</strong>)，分别对应文件、方法和行号，像NSLog这种应用广泛的宏，最好能少改动其他文件的代码部分。那么，最终只要在项目的预编译pch文件里加上下面的代码：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>#define NSLog(format, ...) do{                                              \
-</span><span class='line'>    fprintf(stderr, "&lt;%s : %d&gt; %s\n", [[[NSString stringWithUTF8String:__FILE__] lastPathComponent] UTF8String], __LINE__, __func__);                                                              \
-</span><span class='line'>    NSLog((format), ##__VA_ARGS__);                                         \
-</span><span class='line'>    fprintf(stderr,"-------\n");                                            \
-</span><span class='line'>    } while (0)</span></code></pre></td></tr></table></div></figure>
-
-]]></content>
-  </entry>
   
   <entry>
     <title type="html"><![CDATA[Apple Watch 开发初探]]></title>
@@ -521,6 +378,149 @@ DarwinNotifyCenter是系统全局的通知，跨进程当然不在话下。
 <p><a href="http://www.zhihu.com/question/29446492">http://www.zhihu.com/question/29446492</a>
 <a href="https://developer.apple.com/watch/human-interface-guidelines/">https://developer.apple.com/watch/human-interface-guidelines/</a>
 <a href="http://onevcat.com/2014/11/watch-kit/">http://onevcat.com/2014/11/watch-kit/</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[IOS开发中宏的应用]]></title>
+    <link href="http://wrlqwe.github.io/blog/2015/09/01/IOS%E5%BC%80%E5%8F%91%E4%B8%AD%E5%AE%8F%E7%9A%84%E5%BA%94%E7%94%A8/"/>
+    <updated>2015-09-01T03:05:39+08:00</updated>
+    <id>http://wrlqwe.github.io/blog/2015/09/01/IOS开发中宏的应用</id>
+    <content type="html"><![CDATA[<h2>什么是宏</h2>
+
+<p>宏(#define)是一种抽象（Abstraction），它根据一系列预定义的规则替换一定的文本模式。一个标识符被宏定义后，该标识符便是一个宏名。这时，在程序中出现的是宏名，对于编译语言，在该程序被编译前，先将宏名用被定义的字符串替换，这称为宏替换，替换后才进行编译，宏替换是简单的替换。</p>
+
+<h2>为什么要用到宏定义</h2>
+
+<p>例如，在开发中，当我们在很多地方要用到同一个数值是，肯定不能直接使用字面值，因为这样会使代码变的不可维护，所以我们经常要这样做：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#define PI 3.1415926535897932</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这样，如果我们要修改PI的精度，直接修改宏就可以了。</p>
+
+<p>我们要针对编译环境进行优化，要这样做：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#ifdef DEBUG
+</span><span class='line'>    NSLog(@"test");
+</span><span class='line'>#endif</span></code></pre></td></tr></table></div></figure>
+
+
+<p>通过这个，我们可以只在DEBUG环境下输出log。</p>
+
+<p><strong>宏定义在C系开发中可以说占有举足轻重的作用，通过使用宏定义，我们可以实现灵活的编程，提高开发和执行效率。为了编译优化和方便，以及跨平台能力，宏被大量使用。</strong></p>
+
+<h2>如何使用？</h2>
+
+<p>宏在预编译时展开，替换成它的本体。只要我们了解到它的这个原理，就能拓展出不同的用法。
+上面两个例子只是简单的使用，它能满足我们特定的需求。
+宏在预编译时展开，替换成它的本体。只要我们围绕它的这个原理，就能拓展出不同的用法，写出更灵活的代码，实现神奇的功能；</p>
+
+<h3>几个概念：</h3>
+
+<ol>
+<li><p>对象宏和函数宏</p>
+
+<blockquote><p>分别指定义常量的宏和可以传参数的宏</p></blockquote></li>
+<li><p>使用"\&ldquo;来确保多行代码宏定义可读性</p>
+
+<blockquote><p>![宏换行][1]</p></blockquote></li>
+<li><p>#与##操作符</p>
+
+<blockquote><p>#的功能是将其后面的宏参数进行字符串化操作，意思就是对它所应用的宏变量通过替换后在其左右各加上一个双引号。##操作符有两种作用：1是可以把两个参数字符串拼接在一起，2是当##放在可变参数前时(##__VA_ARGS__)，在可变参数数量为0时，去掉前面的逗号，防止编译器报错。</p></blockquote></li>
+<li><p>可变参数"&hellip;"</p>
+
+<blockquote><p>用作函数宏中，允许传0个以上的参数，以逗号分隔。</p></blockquote></li>
+</ol>
+
+
+<h3>坑在哪？如何处理？</h3>
+
+<blockquote><p>大部分坑都源人们使用它的时候忽略了它的展开过程，大部分是可以通过编写更严谨的宏和更多的使用括号来避免的。</p></blockquote>
+
+<ul>
+<li>例如，计算两数的和</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#define SUM(a,b) a + b</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在与乘法配合时出现了问题</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>int x = 3 * SUM(2,1);</span></code></pre></td></tr></table></div></figure>
+
+
+<p>它的结果是 x = 3 * 2 + 1，显然不是我们预期的，这种情况我们一般不能吝啬括号</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#define SUM(a,b) (a + b)</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>还有一种常见情况，一个宏执行多个语句</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#define WARN_AND_LOG() warn(); log();</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这种语句在碰到条件语句的时候容易出错：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>if (flag)
+</span><span class='line'>    WARN_AND_LOG()
+</span><span class='line'>else
+</span><span class='line'>    //do sth. else</span></code></pre></td></tr></table></div></figure>
+
+
+<p>它的展开是</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>if (flag)
+</span><span class='line'>    warn(); log();
+</span><span class='line'>else
+</span><span class='line'>    //do sth. else</span></code></pre></td></tr></table></div></figure>
+
+
+<p>条件控制完全失效了
+这种情况一般使用 do while 语句，防止出现意料之外的问题</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#define WARN_AND_LOG() do { warn(); log();} while(0)</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>实例，通过宏来实现灵活的代码</h3>
+
+<blockquote><p>需求
+扩展NSLog()的功能，以使它能打印出更多信息，确定文件行号方法等</p></blockquote>
+
+<p>首先我们要知道，在预编译时，编译器为我们指定了一些内置的宏(_<em>FILE__，_</em>func<strong>，__LINE</strong>)，分别对应文件、方法和行号，像NSLog这种应用广泛的宏，最好能少改动其他文件的代码部分。那么，最终只要在项目的预编译pch文件里加上下面的代码：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#define NSLog(format, ...) do{                                              \
+</span><span class='line'>    fprintf(stderr, "&lt;%s : %d&gt; %s\n", [[[NSString stringWithUTF8String:__FILE__] lastPathComponent] UTF8String], __LINE__, __func__);                                                              \
+</span><span class='line'>    NSLog((format), ##__VA_ARGS__);                                         \
+</span><span class='line'>    fprintf(stderr,"-------\n");                                            \
+</span><span class='line'>    } while (0)</span></code></pre></td></tr></table></div></figure>
+
 ]]></content>
   </entry>
   

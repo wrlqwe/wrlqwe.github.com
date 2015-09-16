@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ios开发 | 往事随风]]></title>
   <link href="http://wrlqwe.github.io/blog/categories/ioskai-fa/atom.xml" rel="self"/>
   <link href="http://wrlqwe.github.io/"/>
-  <updated>2015-09-17T03:33:49+08:00</updated>
+  <updated>2015-09-17T03:35:22+08:00</updated>
   <id>http://wrlqwe.github.io/</id>
   <author>
     <name><![CDATA[王儒林]]></name>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[IOS开发中宏的应用]]></title>
-    <link href="http://wrlqwe.github.io/blog/2015/09/17/IOS%E5%BC%80%E5%8F%91%E4%B8%AD%E5%AE%8F%E7%9A%84%E5%BA%94%E7%94%A8/"/>
-    <updated>2015-09-17T03:05:39+08:00</updated>
-    <id>http://wrlqwe.github.io/blog/2015/09/17/IOS开发中宏的应用</id>
+    <link href="http://wrlqwe.github.io/blog/2015/09/01/IOS%E5%BC%80%E5%8F%91%E4%B8%AD%E5%AE%8F%E7%9A%84%E5%BA%94%E7%94%A8/"/>
+    <updated>2015-09-01T03:05:39+08:00</updated>
+    <id>http://wrlqwe.github.io/blog/2015/09/01/IOS开发中宏的应用</id>
     <content type="html"><![CDATA[<h2>什么是宏</h2>
 
 <p>宏(#define)是一种抽象（Abstraction），它根据一系列预定义的规则替换一定的文本模式。一个标识符被宏定义后，该标识符便是一个宏名。这时，在程序中出现的是宏名，对于编译语言，在该程序被编译前，先将宏名用被定义的字符串替换，这称为宏替换，替换后才进行编译，宏替换是简单的替换。</p>
