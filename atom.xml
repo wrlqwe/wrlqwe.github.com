@@ -1,16 +1,610 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[My Octopress Blog]]></title>
+  <title><![CDATA[往事随风]]></title>
   <link href="http://wrlqwe.github.io/atom.xml" rel="self"/>
   <link href="http://wrlqwe.github.io/"/>
-  <updated>2015-09-17T01:53:04+08:00</updated>
+  <updated>2015-09-17T03:01:53+08:00</updated>
   <id>http://wrlqwe.github.io/</id>
   <author>
-    <name><![CDATA[Your Name]]></name>
+    <name><![CDATA[王儒林]]></name>
     
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Apple Watch 开发初探]]></title>
+    <link href="http://wrlqwe.github.io/blog/2015/09/17/AppleWatch%E5%BC%80%E5%8F%91%E5%88%9D%E6%8E%A2/"/>
+    <updated>2015-09-17T02:57:43+08:00</updated>
+    <id>http://wrlqwe.github.io/blog/2015/09/17/AppleWatch开发初探</id>
+    <content type="html"><![CDATA[<h1>目录</h1>
+
+<blockquote><p><a href="#1">Apple Watch 简介</a>
+<a href="#2">为什么要做Apple Watch App</a>
+<a href="#3">基本概念</a>
+<a href="#4">开始进行开发</a></p>
+
+<ul>
+<li><a href="#4.1">iPhone App、WatchKit Extension和Watch App 三者的关系</a></li>
+<li><a href="#4.2">主要类</a>
+
+<ul>
+<li><a href="#4.2.1">WKInterfaceController</a></li>
+<li><a href="#4.2.2">WKInterfaceObject</a></li>
+<li><a href="#4.2.3">WKInterfaceTable</a></li>
+<li><a href="#4.2.4">WKInterfaceGroup</a></li>
+<li><a href="#4.2.5">Menu</a></li>
+</ul>
+</li>
+<li><a href="#4.3">用户文本输入</a></li>
+<li><a href="#4.4">与iPhone交互</a></li>
+<li><a href="#4.5">其他</a></li>
+<li><a href="#4.6">WatchOS 2.0</a></li>
+<li><a href="#4.7">已有应用分析</a>
+
+<ul>
+<li><a href="#4.7.1">微信</a></li>
+<li><a href="#4.7.2">网易新闻</a></li>
+<li><a href="#4.7.3">家庭用药</a></li>
+<li><a href="#4.7.4">小结</a></li>
+</ul>
+</li>
+</ul>
+
+
+<p><a href="#5">总结</a></p></blockquote>
+
+<hr />
+
+<h2><h1 id="1">Apple Watch 简介</h1></h2>
+
+<p>2014年9月9日，苹果2014年秋季新品发布会在加州库比蒂诺的Flint表演艺术中心举行，会上苹果公司CEO Tim Cook 对外公布了全新的产品：Apple Watch，并于4月24日上市。
+Apple Watch采用蓝宝石屏幕，两个屏幕尺寸。支持电话，语音回短信，连接汽车，天气、航班信息，地图导航，播放音乐，测量心跳、计步等几十种功能，是一款全方位的健康和运动追踪设备。</p>
+
+<h2><h1 id="2">为什么要做Apple Watch App</h1></h2>
+
+<p>得益于Apple的巨大号召力，Apple Watch是目前看来市场上唯一一款有市场前景和应用前景的智能穿戴设备，人们普遍相信Apple能精益求精，做出出色的产品，Apple也对它寄予厚望：</p>
+
+<blockquote><p>&ldquo;No other Apple device has ever been so closely connected to the user.&rdquo;</p></blockquote>
+
+<p>现在已有Apple Watch应用适配的App已经有很多，许多常见的App已经对它做了适配，像微信、微博、网易新闻、qq、支付宝等大众应用，早已推出了Watch版。我司的竞品中，也有提供了Watch版的厂商，落后就要挨打，我们在竞争中已经落后了一丢丢，所以有必要对它进行关注，往后推出产品。
+除此之外，作为一个iOS开发者，为这样一个新的设备做好适配也是很有必要的。</p>
+
+<h2><h1 id="3">基本概念</h1></h2>
+
+<p>Apple Watch 是一条全新的产品线，Apple引入了一些全新的概念在手表上，下面简略介绍一下：</p>
+
+<ul>
+<li><p>Force Touch</p>
+
+<blockquote><p>用力按压屏幕，这会触发当前屏幕的菜单。</p></blockquote></li>
+<li><p>Gestures</p>
+
+<blockquote><p>分别是点按、横划、竖划、侧滑返回。</p></blockquote></li>
+<li><p>Digital Crown</p>
+
+<blockquote><p>数码表冠可以滚动content，点按可以返回应用列表和表盘界面，长按呼出Siri，这些都是系统管理的， 类似于Home键。</p></blockquote></li>
+<li><p>Side Button</p>
+
+<blockquote><p>可以呼出Friends screen，长按会有关机选项。</p></blockquote></li>
+<li><p>Glance</p>
+
+<blockquote><p>Glance界面可以在表盘页面下边缘滑动弹出，用来显示App的预览信息，可以左右横划，每个页面展示一个App的Glance，对应用来说，它不是必须的。</p></blockquote></li>
+<li><p>Notification</p>
+
+<blockquote><p>分为两种，Short looks 和 Long  looks，分别对应刚看到通知的简短信息和停留一会的详细信息。</p></blockquote></li>
+<li><p>handoff</p>
+
+<blockquote><p>Apple Watch helps people quickly access information, but there are times when they may want to dive deeper into content on their iOS devices. Your Apple Watch app uses Handoff to convey information about the wearer’s current activity to their other devices.</p></blockquote></li>
+</ul>
+
+
+<h2><h1 id="4">开始进行开发</h1></h2>
+
+<h3><h2 id="4.1">iPhone App、WatchKit Extension和Watch App 三者的关系</h2></h3>
+
+<p>iOS8开始Apple推出了一个新的概念App Extension，通过App Extension，开发者可以创建像第三方键盘、TodayWidget的这种扩展。</p>
+
+<p>这是他们之间的关系图：
+<img src="http://git.oschina.net/wrl/WatchKitPreview/raw/master/iphone_watch_communication.png?dir=0&amp;filepath=iphone_watch_communication.png&amp;oid=f5513cfe48e9c08eafd746a96ee1e3c96e648a62&amp;sha=c59132507ea92ac235aecf20c15b0c79d6f39b2b" alt="iphone_watch_communication" /></p>
+
+<p>Apple Watch的开发用的也是这种模式，其中Watch App与WatchKit Extension的通信方式我们不用关注，WatchKit的API就是对这种通信的封装。
+在Apple Watch的开发上：</p>
+
+<ul>
+<li>Watch App相当于Host app，它由WatchKit Extension控制，Watch App会安装在手表上，它只包含资源文件，不包含代码。</li>
+<li>WatchKit Extension是安装在手机上的，它负责实现Watch App的逻辑，交互通过蓝牙进行。</li>
+<li>iPhone App是主应用，WatchKit Extension和Watch App依赖于它。</li>
+</ul>
+
+
+<h3><h2 id="4.2">主要类</h2></h3>
+
+<p>AppleWatch发布的时间并不长，现在WatchKit暴露出来的API不多。下面是一些常见的类。</p>
+
+<h4><h3 id="4.2.1">WKInterfaceController</h3></h4>
+
+<p>WKInterfaceController 在 WatchKit 中类似UIKit的 UIViewController，它的生命周期方法比UIViewController少很多：
+<img src="http://git.devzeng.com/images/apple_watch_dev_glance/launch_cycle_2x.png" alt="lifecircle" /></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>func awakeWithContext(context: AnyObject?)//类似viewDidLoad
+</span><span class='line'>func willActivate() // 类似viewDidAppear
+</span><span class='line'>func didDeactivate() // 类似viewDidDispear</span></code></pre></td></tr></table></div></figure>
+
+
+<p>WKInterfaceController还可以负责处理通知的action选择事件，table的选择事件等</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>func handleActionWithIdentifier(identifier: String?, forRemoteNotification remoteNotification: [NSObject : AnyObject]) 
+</span><span class='line'>func handleActionWithIdentifier(identifier: String?, forLocalNotification localNotification: UILocalNotification) 
+</span><span class='line'>func handleUserActivity(userInfo: [NSObject : AnyObject]?) </span></code></pre></td></tr></table></div></figure>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="k">func</span> <span class="n">table</span><span class="p">(</span><span class="nl">table</span><span class="p">:</span> <span class="n">WKInterfaceTable</span><span class="p">,</span> <span class="n">didSelectRowAtIndex</span> <span class="nl">rowIndex</span><span class="p">:</span> <span class="n">Int</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>除了上面几个它还有API与iPhone App 交互</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="k">class</span> <span class="k">func</span> <span class="n">openParentApplication</span><span class="p">(</span><span class="nl">userInfo</span><span class="p">:</span> <span class="p">[</span><span class="nl">NSObject</span> <span class="p">:</span> <span class="n">AnyObject</span><span class="p">],</span> <span class="nl">reply</span><span class="p">:</span> <span class="p">(([</span><span class="nl">NSObject</span> <span class="p">:</span> <span class="n">AnyObject</span><span class="p">],</span> <span class="bp">NSError</span><span class="o">?</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Void</span><span class="p">)</span><span class="o">?</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Bool</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>处理handoff的API，其中updateUserActivity()向iOS App提供handoff信息，可以在iOS应用端处理此信息。
+invalidateUserActivity()通知系统handoff信息已经更改。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="k">func</span> <span class="n">updateUserActivity</span><span class="p">(</span><span class="nl">type</span><span class="p">:</span> <span class="n">String</span><span class="p">,</span> <span class="nl">userInfo</span><span class="p">:</span> <span class="p">[</span><span class="nl">NSObject</span> <span class="p">:</span> <span class="n">AnyObject</span><span class="p">]</span><span class="o">?</span><span class="p">,</span> <span class="nl">webpageURL</span><span class="p">:</span> <span class="bp">NSURL</span><span class="o">?</span><span class="p">)</span>
+</span><span class='line'><span class="k">func</span> <span class="n">invalidateUserActivity</span><span class="p">()</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4><h3 id="4.2.2">WKInterfaceObject</h3></h4>
+
+<p>是UI元素的父类，Button、Label和Image这些类都是它的子类。WKInterfaceObject在功能和用法上有点像UIKit中的UIView，但是它并不是直接显示在Watch上的View，因为代码的逻辑是运行在iOS上的，WKInterfaceObject只是watch app在WatchKit Extension上的代理对象。
+在WatchKit 1.0它只有5个API：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="k">func</span> <span class="n">setHidden</span><span class="p">(</span><span class="nl">hidden</span><span class="p">:</span> <span class="n">Bool</span><span class="p">)</span>
+</span><span class='line'><span class="k">func</span> <span class="n">setAlpha</span><span class="p">(</span><span class="nl">alpha</span><span class="p">:</span> <span class="n">CGFloat</span><span class="p">)</span>
+</span><span class='line'><span class="k">func</span> <span class="n">setWidth</span><span class="p">(</span><span class="nl">width</span><span class="p">:</span> <span class="n">CGFloat</span><span class="p">)</span>
+</span><span class='line'><span class="k">func</span> <span class="n">setHeight</span><span class="p">(</span><span class="nl">height</span><span class="p">:</span> <span class="n">CGFloat</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">var</span> <span class="nl">interfaceProperty</span><span class="p">:</span> <span class="n">String</span> <span class="p">{</span> <span class="kr">get</span> <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>可见它不支持操作添加删除子元素（只能用storyboard了），不如UIView灵活。</p>
+
+<h4><h3 id="4.2.3">WKInterfaceTable</h3></h4>
+
+<p>WKInterfaceTable相当于UIKit的UITableView，在WatchOS1.0上，AppleWatch的逻辑代码执行在iPhone上，要以delegate方式交互数据受蓝牙传输的限制，并不现实，要对它进行配置，只能靠初始化时调用代码设置：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="c1">//  MyRowController.swift</span>
+</span><span class='line'><span class="k">import</span> <span class="n">Foundation</span>
+</span><span class='line'><span class="k">import</span> <span class="n">WatchKit</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nl">MyRowController</span><span class="p">:</span> <span class="bp">NSObject</span> <span class="p">{</span>
+</span><span class='line'>    <span class="p">@</span><span class="kt">IBOutlet</span> <span class="k">weak</span> <span class="k">var</span> <span class="nl">label</span><span class="p">:</span> <span class="n">WKInterfaceLabel</span><span class="o">!</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//  InterfaceController.swift</span>
+</span><span class='line'><span class="k">import</span> <span class="n">WatchKit</span>
+</span><span class='line'><span class="k">import</span> <span class="n">Foundation</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nl">InterfaceController</span><span class="p">:</span> <span class="n">WKInterfaceController</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">let</span> <span class="nl">tableDataSource</span> <span class="p">:[[</span><span class="nl">String</span><span class="p">:</span><span class="n">String</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span>
+</span><span class='line'>        <span class="p">[</span><span class="s">&quot;title&quot;</span><span class="o">:</span><span class="s">&quot;title0&quot;</span><span class="p">,</span><span class="s">&quot;description&quot;</span><span class="o">:</span><span class="s">&quot;description0&quot;</span><span class="p">],</span>
+</span><span class='line'>        <span class="p">[</span><span class="s">&quot;title&quot;</span><span class="o">:</span><span class="s">&quot;title1&quot;</span><span class="p">,</span><span class="s">&quot;description&quot;</span><span class="o">:</span><span class="s">&quot;description1&quot;</span><span class="p">],</span>
+</span><span class='line'>        <span class="p">[</span><span class="s">&quot;title&quot;</span><span class="o">:</span><span class="s">&quot;title2&quot;</span><span class="p">,</span><span class="s">&quot;description&quot;</span><span class="o">:</span><span class="s">&quot;description2&quot;</span><span class="p">],</span>
+</span><span class='line'>        <span class="p">[</span><span class="s">&quot;title&quot;</span><span class="o">:</span><span class="s">&quot;title3&quot;</span><span class="p">,</span><span class="s">&quot;description&quot;</span><span class="o">:</span><span class="s">&quot;description3&quot;</span><span class="p">],</span>
+</span><span class='line'>        <span class="p">[</span><span class="s">&quot;title&quot;</span><span class="o">:</span><span class="s">&quot;title4&quot;</span><span class="p">,</span><span class="s">&quot;description&quot;</span><span class="o">:</span><span class="s">&quot;description4&quot;</span><span class="p">],</span>
+</span><span class='line'>        <span class="p">[</span><span class="s">&quot;title&quot;</span><span class="o">:</span><span class="s">&quot;title5&quot;</span><span class="p">,</span><span class="s">&quot;description&quot;</span><span class="o">:</span><span class="s">&quot;description5&quot;</span><span class="p">],</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="p">]</span>
+</span><span class='line'>    <span class="p">@</span><span class="kt">IBOutlet</span> <span class="k">weak</span> <span class="k">var</span> <span class="nl">table</span><span class="p">:</span> <span class="n">WKInterfaceTable</span><span class="o">!</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kr">override</span> <span class="n">awakeWithContext</span><span class="p">(</span><span class="nl">context</span><span class="p">:</span> <span class="n">AnyObject</span><span class="o">?</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nb">super</span><span class="p">.</span><span class="n">awakeWithContext</span><span class="p">(</span><span class="nl">context</span><span class="p">:</span> <span class="n">context</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="n">table</span><span class="p">.</span><span class="n">setNumberOfRows</span><span class="p">(</span><span class="n">data</span><span class="p">.</span><span class="n">count</span><span class="p">,</span> <span class="nl">withRowType</span><span class="p">:</span> <span class="s">&quot;MyRowController&quot;</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="k">in</span> <span class="n">enumerate</span><span class="p">(</span><span class="n">tableDataSource</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">if</span> <span class="k">let</span> <span class="n">rowController</span> <span class="o">=</span> <span class="n">table</span><span class="p">.</span><span class="n">rowControllerAtIndex</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="kt">as</span><span class="o">?</span> <span class="n">MyRowController</span> <span class="p">{</span>
+</span><span class='line'>                <span class="n">rowController</span><span class="p">.</span><span class="n">info</span> <span class="o">=</span> <span class="n">value</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4><h3 id="4.2.4">WKInterfaceGroup</h3></h4>
+
+<p>WKInterfaceGroup是当前开放的View里唯一一个可以放置子WKInterfaceObject的组件，我们可以向它的内部横向或纵向的添加子组件，可以设置边距和间距。
+但可惜的是，这只能再Storyboard中完成，没有API可以动态增删组件，幸亏可以通过控制hidden来改变布局。它的API只有设置背景和设置圆角大小。</p>
+
+<h4><h3 id="4.2.5">Menu</h3></h4>
+
+<p>Context Menu是AppleWatch的独有概念，它由ForceTouch呼出，可以在代码里调整它的数量和功能，有点像安卓里的上下文菜单。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="k">func</span> <span class="n">addMenuItemWithImage</span><span class="p">(</span><span class="nl">image</span><span class="p">:</span> <span class="bp">UIImage</span><span class="p">,</span> <span class="nl">title</span><span class="p">:</span> <span class="n">String</span><span class="p">,</span> <span class="nl">action</span><span class="p">:</span> <span class="n">Selector</span><span class="p">)</span> <span class="c1">// all parameters must be non-nil</span>
+</span><span class='line'><span class="k">func</span> <span class="n">addMenuItemWithImageNamed</span><span class="p">(</span><span class="nl">imageName</span><span class="p">:</span> <span class="n">String</span><span class="p">,</span> <span class="nl">title</span><span class="p">:</span> <span class="n">String</span><span class="p">,</span> <span class="nl">action</span><span class="p">:</span> <span class="n">Selector</span><span class="p">)</span>
+</span><span class='line'><span class="k">func</span> <span class="n">addMenuItemWithItemIcon</span><span class="p">(</span><span class="nl">itemIcon</span><span class="p">:</span> <span class="n">WKMenuItemIcon</span><span class="p">,</span> <span class="nl">title</span><span class="p">:</span> <span class="n">String</span><span class="p">,</span> <span class="nl">action</span><span class="p">:</span> <span class="n">Selector</span><span class="p">)</span>
+</span><span class='line'><span class="k">func</span> <span class="n">clearAllMenuItems</span><span class="p">()</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3><h2 id="4.3">用户文本输入</h2></h3>
+
+<p>使用 presentTextInputControllerWithSuggestions 方法实现输入（语音转文本）。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="k">func</span> <span class="n">presentTextInputControllerWithSuggestions</span><span class="p">(</span><span class="nl">suggestions</span><span class="p">:</span> <span class="p">[</span><span class="n">AnyObject</span><span class="p">]</span><span class="o">?</span><span class="p">,</span> <span class="n">allowedInputMode</span> <span class="nl">inputMode</span><span class="p">:</span> <span class="n">WKTextInputMode</span><span class="p">,</span> <span class="nl">completion</span><span class="p">:</span> <span class="p">([</span><span class="n">AnyObject</span><span class="p">]</span><span class="o">!</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Void</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3><h2 id="4.4">与iPhone交互</h2></h3>
+
+<p>Watch App 从运行机制上更像是 iOS 应用的一个 Widget，本质上跟 iPhone 锁屏界面的“今天”（Today）没有区别，它们的开发思路和运行模式也很接近，Today 和 Watch APP 都属于 iOS 中 Extension 开发。</p>
+
+<p>这就意味着，WatchOS的App跟iOS的App做交互很麻烦，查了一下，开发者可以使用下面几种方式实现：
+App的通信需要我们自己开发。有下面几种方式：
+Extension和iPhone</p>
+
+<ol>
+<li>共享存储空间
+ App之间的一种通信方式是读写同一块共享存储空间，达到数据交换的目的，我们可以共享NSUserDefault或SQLite。需要注意的是Extension和iPhone App属于不同的进程，要共享存储空间，需要在工程对应的target中同时打开App Groups的权限，并选择共享的组名。</li>
+<li>直接通信
+xtension和iPhone App另外一种通信方式是Extension主动向iPhone App发起请求，进行某种操作，或者请求数据。</li>
+<li>CFNotificationCenter
+DarwinNotifyCenter是系统全局的通知，跨进程当然不在话下。
+
+<blockquote><p>The Darwin Notify Center has no notion of per-user sessions, all notifications are system-wide.</p></blockquote></li>
+</ol>
+
+
+<p>WatchKit Extension中向iPhone App发送请求：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="k">class</span> <span class="k">func</span> <span class="n">openParentApplication</span><span class="p">(</span><span class="nl">userInfo</span><span class="p">:</span> <span class="p">[</span><span class="nl">NSObject</span> <span class="p">:</span> <span class="n">AnyObject</span><span class="p">],</span> <span class="nl">reply</span><span class="p">:</span> <span class="p">(([</span><span class="nl">NSObject</span> <span class="p">:</span> <span class="n">AnyObject</span><span class="p">]</span><span class="o">!</span><span class="p">,</span> <span class="bp">NSError</span><span class="o">!</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Void</span><span class="p">)</span><span class="o">?</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Bool</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在iPhone App的AppDelegate中实现如下方法响应Watch App的请求：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='swift'><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">application:</span><span class="p">(</span><span class="bp">UIApplication</span> <span class="o">*</span> <span class="n">nonnull</span><span class="p">)</span><span class="nv">application</span> <span class="nf">handleWatchKitExtensionRequest:</span><span class="p">(</span><span class="bp">NSDictionary</span> <span class="o">*</span> <span class="n">nullable</span><span class="p">)</span><span class="nv">userInfo</span> <span class="nf">reply:</span><span class="p">(</span><span class="kt">void</span> <span class="p">(</span><span class="o">^</span> <span class="n">nonnull</span><span class="p">)(</span><span class="bp">NSDictionary</span> <span class="o">*</span> <span class="n">nullable</span> <span class="n">replyInfo</span><span class="p">))</span><span class="nv">reply</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>此外，我们还可以通过openURL的方式由WatchKit Extension向iOS App发起请求。</p>
+
+<h3><h2 id="4.5">其他</h2></h3>
+
+<p>WatchKit Extension是运行在手机上的，资源如果展示在手表上要经过蓝牙传输，所以一般需要把资源文件放在Watch App的target里。
+因为代码并不直接操控Watch上的View，所以，手表上的touch事件无法捕捉，动画也只有帧动画。</p>
+
+<h3><h2 id="4.6">WatchOS 2.0</h2></h3>
+
+<p>以上只适用于WatchOS 1.0，WatchOS 2.0会有一个巨大的改变:Apple开放了多个硬件的权限，Apple Watch可以连接Wifi，开发者可以调用声音视频，使用它上面的传感器。</p>
+
+<h4>Apps now run natively for better performance.</h4>
+
+<blockquote><p>With watchOS 2, many apps are native apps, which means they run entirely on your Apple Watch. So they load more quickly and have even greater capabilities.</p></blockquote>
+
+<h4>Do even more with apps.</h4>
+
+<blockquote><p>Apple Watch apps have more possibilities with watchOS 2. Apps can now take advantage of features like <strong>the Taptic Engine , Digital Crown, accelerometer, heart rate sensor, speaker, and microphone</strong>.</p></blockquote>
+
+<h3><h2 id="4.7">已有应用分析</h2></h3>
+
+<h4><h3 id="4.7.1">微信</h3></h4>
+
+<p>微信可以查看简单的消息和浏览朋友圈，有一个很有趣的功能，它可以在手表上向好友打招呼，好友的iPhone上会有一个定制的通知。</p>
+
+<h4><h3 id="4.7.2">网易新闻</h3></h4>
+
+<p>可以看新闻列表和内容，不过实际操作起来并不爽快，不如直接看手机。</p>
+
+<h4><h3 id="4.7.3">家庭用药</h3></h4>
+
+<p>定时提醒用药有点抓住了痛点，其他功能并没什么用，只会提示打开iOS App查看文章。</p>
+
+<h4><h3 id="4.7.4">小结</h3></h4>
+
+<p>现在的好应用还是太少了，这不得不感谢糟糕的API。</p>
+
+<h2><h1 id="5">总结</h1></h2>
+
+<p>Apple Watch发布的时候说的很好听，但是实际开发中的限制太多，根据我对API的分析，它为开发者开放的东西太少了，动画基本不可用，视频音乐不支持，界面也不怎么灵活，手表当中一些炫酷的功能也没有API，就好像传感器和屏幕仅仅是粘在了一起，目前用处不大。虽然我们有竞品早一步进入了市场，基于Apple的限制，也没法做出很出色的产品，这也是开头我所说的落后一丢丢的由来。Watch OS 2.0的发布将会是一个跨越，它会带来更加灵活强大的功能，开发者在新的平台上能开发出有想象力的应用。</p>
+
+<h4>参考文献</h4>
+
+<p><a href="http://www.zhihu.com/question/29446492">http://www.zhihu.com/question/29446492</a>
+<a href="https://developer.apple.com/watch/human-interface-guidelines/">https://developer.apple.com/watch/human-interface-guidelines/</a>
+<a href="http://onevcat.com/2014/11/watch-kit/">http://onevcat.com/2014/11/watch-kit/</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Ios开发中宏的应用]]></title>
+    <link href="http://wrlqwe.github.io/blog/2015/09/17/IOS%E5%BC%80%E5%8F%91%E4%B8%AD%E5%AE%8F%E7%9A%84%E5%BA%94%E7%94%A8/"/>
+    <updated>2015-09-17T00:00:00+08:00</updated>
+    <id>http://wrlqwe.github.io/blog/2015/09/17/IOS开发中宏的应用</id>
+    <content type="html"><![CDATA[<h1></h1>
+
+<h2>什么是宏</h2>
+
+<p>宏(#define)是一种抽象（Abstraction），它根据一系列预定义的规则替换一定的文本模式。一个标识符被宏定义后，该标识符便是一个宏名。这时，在程序中出现的是宏名，对于编译语言，在该程序被编译前，先将宏名用被定义的字符串替换，这称为宏替换，替换后才进行编译，宏替换是简单的替换。</p>
+
+<h2>为什么要用到宏定义</h2>
+
+<p>例如，在开发中，当我们在很多地方要用到同一个数值是，肯定不能直接使用字面值，因为这样会使代码变的不可维护，所以我们经常要这样做：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#define PI 3.1415926535897932</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这样，如果我们要修改PI的精度，直接修改宏就可以了。</p>
+
+<p>我们要针对编译环境进行优化，要这样做：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#ifdef DEBUG
+</span><span class='line'>    NSLog(@"test");
+</span><span class='line'>#endif</span></code></pre></td></tr></table></div></figure>
+
+
+<p>通过这个，我们可以只在DEBUG环境下输出log。</p>
+
+<p><strong>宏定义在C系开发中可以说占有举足轻重的作用，通过使用宏定义，我们可以实现灵活的编程，提高开发和执行效率。为了编译优化和方便，以及跨平台能力，宏被大量使用。</strong></p>
+
+<h2>如何使用？</h2>
+
+<p>宏在预编译时展开，替换成它的本体。只要我们了解到它的这个原理，就能拓展出不同的用法。
+上面两个例子只是简单的使用，它能满足我们特定的需求。
+宏在预编译时展开，替换成它的本体。只要我们围绕它的这个原理，就能拓展出不同的用法，写出更灵活的代码，实现神奇的功能；</p>
+
+<h3>几个概念：</h3>
+
+<ol>
+<li><p>对象宏和函数宏</p>
+
+<blockquote><p>分别指定义常量的宏和可以传参数的宏</p></blockquote></li>
+<li><p>使用"\&ldquo;来确保多行代码宏定义可读性</p>
+
+<blockquote><p><img src="http://static.zybuluo.com/wrlqwe/0c3uz54ddc53jqnq3xfz8dcq/AC4075E6-5166-4F5A-A905-F107FE1F7D37.png" alt="宏换行" /></p></blockquote></li>
+<li><p>#与##操作符</p>
+
+<blockquote><p>#的功能是将其后面的宏参数进行字符串化操作，意思就是对它所应用的宏变量通过替换后在其左右各加上一个双引号。##操作符有两种作用：1是可以把两个参数字符串拼接在一起，2是当##放在可变参数前时(##__VA_ARGS__)，在可变参数数量为0时，去掉前面的逗号，防止编译器报错。</p></blockquote></li>
+<li><p>可变参数"&hellip;"</p>
+
+<blockquote><p>用作函数宏中，允许传0个以上的参数，以逗号分隔。</p></blockquote></li>
+</ol>
+
+
+<h3>坑在哪？如何处理？</h3>
+
+<blockquote><p>大部分坑都源人们使用它的时候忽略了它的展开过程，大部分是可以通过编写更严谨的宏和更多的使用括号来避免的。</p></blockquote>
+
+<ul>
+<li>例如，计算两数的和</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#define SUM(a,b) a + b</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在与乘法配合时出现了问题</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>int x = 3 * SUM(2,1);</span></code></pre></td></tr></table></div></figure>
+
+
+<p>它的结果是 x = 3 * 2 + 1，显然不是我们预期的，这种情况我们一般不能吝啬括号</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#define SUM(a,b) (a + b)</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>还有一种常见情况，一个宏执行多个语句</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#define WARN_AND_LOG() warn(); log();</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这种语句在碰到条件语句的时候容易出错：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>if (flag)
+</span><span class='line'>    WARN_AND_LOG()
+</span><span class='line'>else
+</span><span class='line'>    //do sth. else</span></code></pre></td></tr></table></div></figure>
+
+
+<p>它的展开是</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>if (flag)
+</span><span class='line'>    warn(); log();
+</span><span class='line'>else
+</span><span class='line'>    //do sth. else</span></code></pre></td></tr></table></div></figure>
+
+
+<p>条件控制完全失效了
+这种情况一般使用 do while 语句，防止出现意料之外的问题</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#define WARN_AND_LOG() do { warn(); log();} while(0)</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>实例，通过宏来实现灵活的代码</h3>
+
+<blockquote><p>需求
+扩展NSLog()的功能，以使它能打印出更多信息，确定文件行号方法等</p></blockquote>
+
+<p>首先我们要知道，在预编译时，编译器为我们指定了一些内置的宏(_<em>FILE__，_</em>func<strong>，__LINE</strong>)，分别对应文件、方法和行号，像NSLog这种应用广泛的宏，最好能少改动其他文件的代码部分。那么，最终只要在项目的预编译pch文件里加上下面的代码：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#define NSLog(format, ...) do {                                                 \
+</span><span class='line'>    fprintf(stderr, "&lt;%s : %d&gt; %s\n",                                           \
+</span><span class='line'>            [[[NSString stringWithUTF8String:__FILE__] lastPathComponent] UTF8String],  \
+</span><span class='line'>            __LINE__, __func__);                                                        \
+</span><span class='line'>    NSLog((format), ##__VA_ARGS__);                                           \
+</span><span class='line'>    fprintf(stderr, "-------\n");                                               \
+</span><span class='line'>} while (0)</span></code></pre></td></tr></table></div></figure>
+
+
+<p>我们定义了一个NSLog同名的宏⊙﹏⊙b(幸亏宏的展开比较聪明，编译时不会循环展开NSLog)，根据内置宏，我们打印出了文件名、行号和方法名，为了安全起见把format括起来，"__VA_ARGS__&ldquo;用来接收宏的可变参数列表，在它的前边加上##告诉编译器在没有可变参数的时候去掉逗号，do while循环避免了宏展开坑。
+它的Log结果是这样的：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;main.m : 26&gt; main
+</span><span class='line'>2015-08-26 00:07:14.975 TestMacro[96566:4306478] Hello, World!</span></code></pre></td></tr></table></div></figure>
+
+
+<h1></h1>
+
+<blockquote><p>UIKit里制作view跟名字绑定的NSDictionary的宏</p></blockquote>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>/* This macro is a helper for making view dictionaries for +constraintsWithVisualFormat:options:metrics:views:.  
+</span><span class='line'> NSDictionaryOfVariableBindings(v1, v2, v3) is equivalent to [NSDictionary dictionaryWithObjectsAndKeys:v1, @"v1", v2, @"v2", v3, @"v3", nil];
+</span><span class='line'> */
+</span><span class='line'>#define NSDictionaryOfVariableBindings(...) _NSDictionaryOfVariableBindings(@"" # __VA_ARGS__, __VA_ARGS__, nil)
+</span><span class='line'>UIKIT_EXTERN NSDictionary *_NSDictionaryOfVariableBindings(NSString *commaSeparatedKeysString, id firstValue, ...) NS_AVAILABLE_IOS(6_0);</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这句宏就应用了#号来把参数转义成string，随后再进行处理。</p>
+
+<blockquote><p>宏的展开顺序为先完全展开宏参数，再扫描宏展开后里面的宏，如此反复，有两种例外参数不会被先展开，宏内容中含有#，##这两个符号的时候。
+根据这个特性，我们可以做到一个很神奇的功能：打印出宏的展开语句</p></blockquote>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#define __toString(x) __toString_0(x)
+</span><span class='line'>#define __toString_0(x) #x
+</span><span class='line'>#define LOG_MACRO(x) NSLog(@"%s=\n%s", #x, __toString(x))</span></code></pre></td></tr></table></div></figure>
+
+
+<p>用它来打印我们刚刚的SUM宏，结果是这样的</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>LOG_MACRO(SUM(10,3));</span></code></pre></td></tr></table></div></figure>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>2015-08-26 01:02:02.011 TestMacro[96950:4438855] SUM(10,3)=
+</span><span class='line'>(10 + 3)</span></code></pre></td></tr></table></div></figure>
+
+
+<p>如果你不太明白的话，可以一步一步展开来解析
+1. 第一层展开，展开了LOG_MACRO()</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>NSLog(@"%s=\n%s", "SUM(10,3)", __toString(SUM(10,3)));</span></code></pre></td></tr></table></div></figure>
+
+
+<p>2.第二层展开，展开了__toString()和SUM()</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>NSLog(@"%s=\n%s", "SUM(10,3)", __toString_0((a + b)));</span></code></pre></td></tr></table></div></figure>
+
+
+<p>3.第三层展开，__toString_0()</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>NSLog(@"%s=\n%s", "SUM(10,3)", "(a + b)");</span></code></pre></td></tr></table></div></figure>
+
+
+<p>是不是很神奇？</p>
+
+<h2>结语</h2>
+
+<p>本文对C中宏定义#define在使用时容易出现的问题进行了解析，列举了多个例子希望能清楚的解释问题，谢谢观看~</p>
+
+<p><em>写这篇文章主要是因为看extobjc的代码，对宏定义用的很神奇，未来准备再作一篇它的代码分析，敬请期待~</em></p>
+]]></content>
+  </entry>
   
 </feed>

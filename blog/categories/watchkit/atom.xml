@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Watchkit | 往事随风]]></title>
+  <link href="http://wrlqwe.github.io/blog/categories/watchkit/atom.xml" rel="self"/>
+  <link href="http://wrlqwe.github.io/"/>
+  <updated>2015-09-17T03:01:53+08:00</updated>
+  <id>http://wrlqwe.github.io/</id>
+  <author>
+    <name><![CDATA[王儒林]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Apple Watch 开发初探]]></title>
+    <link href="http://wrlqwe.github.io/blog/2015/09/17/AppleWatch%E5%BC%80%E5%8F%91%E5%88%9D%E6%8E%A2/"/>
+    <updated>2015-09-17T02:57:43+08:00</updated>
+    <id>http://wrlqwe.github.io/blog/2015/09/17/AppleWatch开发初探</id>
+    <content type="html"><![CDATA[<h1>目录</h1>
+
+<blockquote><p><a href="#1">Apple Watch 简介</a>
+<a href="#2">为什么要做Apple Watch App</a>
+<a href="#3">基本概念</a>
+<a href="#4">开始进行开发</a></p>
+
+<ul>
+<li><a href="#4.1">iPhone App、WatchKit Extension和Watch App 三者的关系</a></li>
+<li><a href="#4.2">主要类</a>
+
+<ul>
+<li><a href="#4.2.1">WKInterfaceController</a></li>
+<li><a href="#4.2.2">WKInterfaceObject</a></li>
+<li><a href="#4.2.3">WKInterfaceTable</a></li>
+<li><a href="#4.2.4">WKInterfaceGroup</a></li>
+<li><a href="#4.2.5">Menu</a></li>
+</ul>
+</li>
+<li><a href="#4.3">用户文本输入</a></li>
+<li><a href="#4.4">与iPhone交互</a></li>
+<li><a href="#4.5">其他</a></li>
+<li><a href="#4.6">WatchOS 2.0</a></li>
+<li><a href="#4.7">已有应用分析</a>
+
+<ul>
+<li><a href="#4.7.1">微信</a></li>
+<li><a href="#4.7.2">网易新闻</a></li>
+<li><a href="#4.7.3">家庭用药</a></li>
+<li><a href="#4.7.4">小结</a></li>
+</ul>
+</li>
+</ul>
+
+
+<p><a href="#5">总结</a></p></blockquote>
+
+<hr />
+
+<h2><h1 id="1">Apple Watch 简介</h1></h2>
+
+<p>2014年9月9日，苹果2014年秋季新品发布会在加州库比蒂诺的Flint表演艺术中心举行，会上苹果公司CEO Tim Cook 对外公布了全新的产品：Apple Watch，并于4月24日上市。
+Apple Watch采用蓝宝石屏幕，两个屏幕尺寸。支持电话，语音回短信，连接汽车，天气、航班信息，地图导航，播放音乐，测量心跳、计步等几十种功能，是一款全方位的健康和运动追踪设备。</p>
+
+<h2><h1 id="2">为什么要做Apple Watch App</h1></h2>
+
+<p>得益于Apple的巨大号召力，Apple Watch是目前看来市场上唯一一款有市场前景和应用前景的智能穿戴设备，人们普遍相信Apple能精益求精，做出出色的产品，Apple也对它寄予厚望：</p>
+
+<blockquote><p>&ldquo;No other Apple device has ever been so closely connected to the user.&rdquo;</p></blockquote>
+
+<p>现在已有Apple Watch应用适配的App已经有很多，许多常见的App已经对它做了适配，像微信、微博、网易新闻、qq、支付宝等大众应用，早已推出了Watch版。我司的竞品中，也有提供了Watch版的厂商，落后就要挨打，我们在竞争中已经落后了一丢丢，所以有必要对它进行关注，往后推出产品。
+除此之外，作为一个iOS开发者，为这样一个新的设备做好适配也是很有必要的。</p>
+
+<h2><h1 id="3">基本概念</h1></h2>
+
+<p>Apple Watch 是一条全新的产品线，Apple引入了一些全新的概念在手表上，下面简略介绍一下：</p>
+
+<ul>
+<li><p>Force Touch</p>
+
+<blockquote><p>用力按压屏幕，这会触发当前屏幕的菜单。</p></blockquote></li>
+<li><p>Gestures</p>
+
+<blockquote><p>分别是点按、横划、竖划、侧滑返回。</p></blockquote></li>
+<li><p>Digital Crown</p>
+
+<blockquote><p>数码表冠可以滚动content，点按可以返回应用列表和表盘界面，长按呼出Siri，这些都是系统管理的， 类似于Home键。</p></blockquote></li>
+<li><p>Side Button</p>
+
+<blockquote><p>可以呼出Friends screen，长按会有关机选项。</p></blockquote></li>
+<li><p>Glance</p>
+
+<blockquote><p>Glance界面可以在表盘页面下边缘滑动弹出，用来显示App的预览信息，可以左右横划，每个页面展示一个App的Glance，对应用来说，它不是必须的。</p></blockquote></li>
+<li><p>Notification</p>
+
+<blockquote><p>分为两种，Short looks 和 Long  looks，分别对应刚看到通知的简短信息和停留一会的详细信息。</p></blockquote></li>
+<li><p>handoff</p>
+
+<blockquote><p>Apple Watch helps people quickly access information, but there are times when they may want to dive deeper into content on their iOS devices. Your Apple Watch app uses Handoff to convey information about the wearer’s current activity to their other devices.</p></blockquote></li>
+</ul>
+
+
+<h2><h1 id="4">开始进行开发</h1></h2>
+
+<h3><h2 id="4.1">iPhone App、WatchKit Extension和Watch App 三者的关系</h2></h3>
+
+<p>iOS8开始Apple推出了一个新的概念App Extension，通过App Extension，开发者可以创建像第三方键盘、TodayWidget的这种扩展。</p>
+
+<p>这是他们之间的关系图：
+<img src="http://git.oschina.net/wrl/WatchKitPreview/raw/master/iphone_watch_communication.png?dir=0&amp;filepath=iphone_watch_communication.png&amp;oid=f5513cfe48e9c08eafd746a96ee1e3c96e648a62&amp;sha=c59132507ea92ac235aecf20c15b0c79d6f39b2b" alt="iphone_watch_communication" /></p>
+
+<p>Apple Watch的开发用的也是这种模式，其中Watch App与WatchKit Extension的通信方式我们不用关注，WatchKit的API就是对这种通信的封装。
+在Apple Watch的开发上：</p>
+
+<ul>
+<li>Watch App相当于Host app，它由WatchKit Extension控制，Watch App会安装在手表上，它只包含资源文件，不包含代码。</li>
+<li>WatchKit Extension是安装在手机上的，它负责实现Watch App的逻辑，交互通过蓝牙进行。</li>
+<li>iPhone App是主应用，WatchKit Extension和Watch App依赖于它。</li>
+</ul>
+
+
+<h3><h2 id="4.2">主要类</h2></h3>
+
+<p>AppleWatch发布的时间并不长，现在WatchKit暴露出来的API不多。下面是一些常见的类。</p>
+
+<h4><h3 id="4.2.1">WKInterfaceController</h3></h4>
+
+<p>WKInterfaceController 在 WatchKit 中类似UIKit的 UIViewController，它的生命周期方法比UIViewController少很多：
+<img src="http://git.devzeng.com/images/apple_watch_dev_glance/launch_cycle_2x.png" alt="lifecircle" />
+<code>
+func awakeWithContext(context: AnyObject?)//类似viewDidLoad
+func willActivate() // 类似viewDidAppear
+func didDeactivate() // 类似viewDidDispear
+</code>
+WKInterfaceController还可以负责处理通知的action选择事件，table的选择事件等
+<code>
+func handleActionWithIdentifier(identifier: String?, forRemoteNotification remoteNotification: [NSObject : AnyObject])
+func handleActionWithIdentifier(identifier: String?, forLocalNotification localNotification: UILocalNotification)
+func handleUserActivity(userInfo: [NSObject : AnyObject]?)
+</code>
+<code>swift
+func table(table: WKInterfaceTable, didSelectRowAtIndex rowIndex: Int)
+</code></p>
+
+<p>除了上面几个它还有API与iPhone App 交互
+<code>
+class func openParentApplication(userInfo: [NSObject : AnyObject], reply: (([NSObject : AnyObject], NSError?) -&gt; Void)?) -&gt; Bool
+</code>
+处理handoff的API，其中updateUserActivity()向iOS App提供handoff信息，可以在iOS应用端处理此信息。
+invalidateUserActivity()通知系统handoff信息已经更改。
+<code>
+func updateUserActivity(type: String, userInfo: [NSObject : AnyObject]?, webpageURL: NSURL?)
+func invalidateUserActivity()
+</code></p>
+
+<h4><h3 id="4.2.2">WKInterfaceObject</h3></h4>
+
+<p>是UI元素的父类，Button、Label和Image这些类都是它的子类。WKInterfaceObject在功能和用法上有点像UIKit中的UIView，但是它并不是直接显示在Watch上的View，因为代码的逻辑是运行在iOS上的，WKInterfaceObject只是watch app在WatchKit Extension上的代理对象。
+在WatchKit 1.0它只有5个API：
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>func setHidden(hidden: Bool)
+</span><span class='line'>func setAlpha(alpha: CGFloat)
+</span><span class='line'>func setWidth(width: CGFloat)
+</span><span class='line'>func setHeight(height: CGFloat)&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;var interfaceProperty: String { get }</span></code></pre></td></tr></table></div></figure>
+可见它不支持操作添加删除子元素（只能用storyboard了），不如UIView灵活。</p>
+
+<h4><h3 id="4.2.3">WKInterfaceTable</h3></h4>
+
+<p>WKInterfaceTable相当于UIKit的UITableView，在WatchOS1.0上，AppleWatch的逻辑代码执行在iPhone上，要以delegate方式交互数据受蓝牙传输的限制，并不现实，要对它进行配置，只能靠初始化时调用代码设置：
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>//  MyRowController.swift
+</span><span class='line'>import Foundation&lt;br/&gt;
+</span><span class='line'>import WatchKit&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;class MyRowController: NSObject {&lt;br/&gt;
+</span><span class='line'>    @IBOutlet weak var label: WKInterfaceLabel!
+</span><span class='line'>}&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;//  InterfaceController.swift
+</span><span class='line'>import WatchKit&lt;br/&gt;
+</span><span class='line'>import Foundation&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;class InterfaceController: WKInterfaceController {&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;let tableDataSource :[[String:String]] = [
+</span><span class='line'>    ["title":"title0","description":"description0"],
+</span><span class='line'>    ["title":"title1","description":"description1"],
+</span><span class='line'>    ["title":"title2","description":"description2"],
+</span><span class='line'>    ["title":"title3","description":"description3"],
+</span><span class='line'>    ["title":"title4","description":"description4"],
+</span><span class='line'>    ["title":"title5","description":"description5"],
+</span><span class='line'>
+</span><span class='line'>]
+</span><span class='line'>@IBOutlet weak var table: WKInterfaceTable!
+</span><span class='line'>
+</span><span class='line'>override awakeWithContext(context: AnyObject?) {
+</span><span class='line'>    super.awakeWithContext(context: context)
+</span><span class='line'>
+</span><span class='line'>    table.setNumberOfRows(data.count, withRowType: "MyRowController")
+</span><span class='line'>    for (i, value) in enumerate(tableDataSource) {
+</span><span class='line'>        if let rowController = table.rowControllerAtIndex(i) as? MyRowController {
+</span><span class='line'>            rowController.info = value
+</span><span class='line'>        }
+</span><span class='line'>    }
+</span><span class='line'>}
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;}</span></code></pre></td></tr></table></div></figure></p>
+
+<h4><h3 id="4.2.4">WKInterfaceGroup</h3></h4>
+
+<p>WKInterfaceGroup是当前开放的View里唯一一个可以放置子WKInterfaceObject的组件，我们可以向它的内部横向或纵向的添加子组件，可以设置边距和间距。
+但可惜的是，这只能再Storyboard中完成，没有API可以动态增删组件，幸亏可以通过控制hidden来改变布局。它的API只有设置背景和设置圆角大小。</p>
+
+<h4><h3 id="4.2.5">Menu</h3></h4>
+
+<p>Context Menu是AppleWatch的独有概念，它由ForceTouch呼出，可以在代码里调整它的数量和功能，有点像安卓里的上下文菜单。
+<code>
+func addMenuItemWithImage(image: UIImage, title: String, action: Selector) // all parameters must be non-nil
+func addMenuItemWithImageNamed(imageName: String, title: String, action: Selector)
+func addMenuItemWithItemIcon(itemIcon: WKMenuItemIcon, title: String, action: Selector)
+func clearAllMenuItems()
+</code></p>
+
+<h3><h2 id="4.3">用户文本输入</h2></h3>
+
+<p>使用 presentTextInputControllerWithSuggestions 方法实现输入（语音转文本）。
+<code>
+    func presentTextInputControllerWithSuggestions(suggestions: [AnyObject]?, allowedInputMode inputMode: WKTextInputMode, completion: ([AnyObject]!) -&gt; Void)
+</code></p>
+
+<h3><h2 id="4.4">与iPhone交互</h2></h3>
+
+<p>Watch App 从运行机制上更像是 iOS 应用的一个 Widget，本质上跟 iPhone 锁屏界面的“今天”（Today）没有区别，它们的开发思路和运行模式也很接近，Today 和 Watch APP 都属于 iOS 中 Extension 开发。</p>
+
+<p>这就意味着，WatchOS的App跟iOS的App做交互很麻烦，查了一下，开发者可以使用下面几种方式实现：
+App的通信需要我们自己开发。有下面几种方式：
+Extension和iPhone</p>
+
+<ol>
+<li>共享存储空间
+ App之间的一种通信方式是读写同一块共享存储空间，达到数据交换的目的，我们可以共享NSUserDefault或SQLite。需要注意的是Extension和iPhone App属于不同的进程，要共享存储空间，需要在工程对应的target中同时打开App Groups的权限，并选择共享的组名。</li>
+<li>直接通信
+xtension和iPhone App另外一种通信方式是Extension主动向iPhone App发起请求，进行某种操作，或者请求数据。</li>
+<li>CFNotificationCenter
+DarwinNotifyCenter是系统全局的通知，跨进程当然不在话下。
+
+<blockquote><p>The Darwin Notify Center has no notion of per-user sessions, all notifications are system-wide.</p></blockquote></li>
+</ol>
+
+
+<p>WatchKit Extension中向iPhone App发送请求：
+<code>
+class func openParentApplication(userInfo: [NSObject : AnyObject], reply: (([NSObject : AnyObject]!, NSError!) -&gt; Void)?) -&gt; Bool
+</code>
+在iPhone App的AppDelegate中实现如下方法响应Watch App的请求：
+<code>
+- (void)application:(UIApplication * nonnull)application handleWatchKitExtensionRequest:(NSDictionary * nullable)userInfo reply:(void (^ nonnull)(NSDictionary * nullable replyInfo))reply;
+</code></p>
+
+<p>此外，我们还可以通过openURL的方式由WatchKit Extension向iOS App发起请求。</p>
+
+<h3><h2 id="4.5">其他</h2></h3>
+
+<p>WatchKit Extension是运行在手机上的，资源如果展示在手表上要经过蓝牙传输，所以一般需要把资源文件放在Watch App的target里。
+因为代码并不直接操控Watch上的View，所以，手表上的touch事件无法捕捉，动画也只有帧动画。</p>
+
+<h3><h2 id="4.6">WatchOS 2.0</h2></h3>
+
+<p>以上只适用于WatchOS 1.0，WatchOS 2.0会有一个巨大的改变:Apple开放了多个硬件的权限，Apple Watch可以连接Wifi，开发者可以调用声音视频，使用它上面的传感器。</p>
+
+<h4>Apps now run natively for better performance.</h4>
+
+<blockquote><p>With watchOS 2, many apps are native apps, which means they run entirely on your Apple Watch. So they load more quickly and have even greater capabilities.</p></blockquote>
+
+<h4>Do even more with apps.</h4>
+
+<blockquote><p>Apple Watch apps have more possibilities with watchOS 2. Apps can now take advantage of features like <strong>the Taptic Engine , Digital Crown, accelerometer, heart rate sensor, speaker, and microphone</strong>.</p></blockquote>
+
+<h3><h2 id="4.7">已有应用分析</h2></h3>
+
+<h4><h3 id="4.7.1">微信</h3></h4>
+
+<p>微信可以查看简单的消息和浏览朋友圈，有一个很有趣的功能，它可以在手表上向好友打招呼，好友的iPhone上会有一个定制的通知。</p>
+
+<h4><h3 id="4.7.2">网易新闻</h3></h4>
+
+<p>可以看新闻列表和内容，不过实际操作起来并不爽快，不如直接看手机。</p>
+
+<h4><h3 id="4.7.3">家庭用药</h3></h4>
+
+<p>定时提醒用药有点抓住了痛点，其他功能并没什么用，只会提示打开iOS App查看文章。</p>
+
+<h4><h3 id="4.7.4">小结</h3></h4>
+
+<p>现在的好应用还是太少了，这不得不感谢糟糕的API。</p>
+
+<h2><h1 id="5">总结</h1></h2>
+
+<p>Apple Watch发布的时候说的很好听，但是实际开发中的限制太多，根据我对API的分析，它为开发者开放的东西太少了，动画基本不可用，视频音乐不支持，界面也不怎么灵活，手表当中一些炫酷的功能也没有API，就好像传感器和屏幕仅仅是粘在了一起，目前用处不大。虽然我们有竞品早一步进入了市场，基于Apple的限制，也没法做出很出色的产品，这也是开头我所说的落后一丢丢的由来。Watch OS 2.0的发布将会是一个跨越，它会带来更加灵活强大的功能，开发者在新的平台上能开发出有想象力的应用。</p>
+
+<h4>参考文献</h4>
+
+<p><a href="http://www.zhihu.com/question/29446492">http://www.zhihu.com/question/29446492</a>
+<a href="https://developer.apple.com/watch/human-interface-guidelines/">https://developer.apple.com/watch/human-interface-guidelines/</a>
+<a href="http://onevcat.com/2014/11/watch-kit/">http://onevcat.com/2014/11/watch-kit/</a></p>
+]]></content>
+  </entry>
+  
+</feed>
