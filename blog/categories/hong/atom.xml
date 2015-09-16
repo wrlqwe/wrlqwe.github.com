@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: 宏 | 往事随风]]></title>
+  <link href="http://wrlqwe.github.io/blog/categories/hong/atom.xml" rel="self"/>
+  <link href="http://wrlqwe.github.io/"/>
+  <updated>2015-09-17T03:23:10+08:00</updated>
+  <id>http://wrlqwe.github.io/</id>
+  <author>
+    <name><![CDATA[王儒林]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[IOS开发中宏的应用]]></title>
+    <link href="http://wrlqwe.github.io/blog/2015/09/17/IOS%E5%BC%80%E5%8F%91%E4%B8%AD%E5%AE%8F%E7%9A%84%E5%BA%94%E7%94%A8/"/>
+    <updated>2015-09-17T03:05:39+08:00</updated>
+    <id>http://wrlqwe.github.io/blog/2015/09/17/IOS开发中宏的应用</id>
+    <content type="html"><![CDATA[<h2>什么是宏</h2>
+
+<p>宏(#define)是一种抽象（Abstraction），它根据一系列预定义的规则替换一定的文本模式。一个标识符被宏定义后，该标识符便是一个宏名。这时，在程序中出现的是宏名，对于编译语言，在该程序被编译前，先将宏名用被定义的字符串替换，这称为宏替换，替换后才进行编译，宏替换是简单的替换。</p>
+
+<h2>为什么要用到宏定义</h2>
+
+<p>例如，在开发中，当我们在很多地方要用到同一个数值是，肯定不能直接使用字面值，因为这样会使代码变的不可维护，所以我们经常要这样做：
+```</p>
+
+<h1>define PI 3.1415926535897932</h1>
+
+<pre><code>这样，如果我们要修改PI的精度，直接修改宏就可以了。
+
+我们要针对编译环境进行优化，要这样做：
+</code></pre>
+
+<h1>ifdef DEBUG</h1>
+
+<pre><code>NSLog(@"test");
+</code></pre>
+
+<h1>endif</h1>
+
+<pre><code>通过这个，我们可以只在DEBUG环境下输出log。
+
+**宏定义在C系开发中可以说占有举足轻重的作用，通过使用宏定义，我们可以实现灵活的编程，提高开发和执行效率。为了编译优化和方便，以及跨平台能力，宏被大量使用。**
+
+## 如何使用？ ##
+宏在预编译时展开，替换成它的本体。只要我们了解到它的这个原理，就能拓展出不同的用法。
+上面两个例子只是简单的使用，它能满足我们特定的需求。
+宏在预编译时展开，替换成它的本体。只要我们围绕它的这个原理，就能拓展出不同的用法，写出更灵活的代码，实现神奇的功能；
+
+### 几个概念：###
+
+1. 对象宏和函数宏
+&gt;分别指定义常量的宏和可以传参数的宏
+
+2. 使用"\"来确保多行代码宏定义可读性
+&gt; ![宏换行][1]
+
+3. \#与##操作符
+&gt;\#的功能是将其后面的宏参数进行字符串化操作，意思就是对它所应用的宏变量通过替换后在其左右各加上一个双引号。##操作符有两种作用：1是可以把两个参数字符串拼接在一起，2是当##放在可变参数前时(##\__VA_ARGS__)，在可变参数数量为0时，去掉前面的逗号，防止编译器报错。
+
+4. 可变参数"..."
+&gt;用作函数宏中，允许传0个以上的参数，以逗号分隔。
+
+### 坑在哪？如何处理？ ###
+
+&gt; 大部分坑都源人们使用它的时候忽略了它的展开过程，大部分是可以通过编写更严谨的宏和更多的使用括号来避免的。
+
+- 例如，计算两数的和
+</code></pre>
+
+<h1>define SUM(a,b) a + b</h1>
+
+<pre><code>在与乘法配合时出现了问题
+</code></pre>
+
+<p>int x = 3 * SUM(2,1);
+<code>
+它的结果是 x = 3 * 2 + 1，显然不是我们预期的，这种情况我们一般不能吝啬括号
+</code></p>
+
+<h1>define SUM(a,b) (a + b)</h1>
+
+<pre><code>- 还有一种常见情况，一个宏执行多个语句
+</code></pre>
+
+<h1>define WARN_AND_LOG() warn(); log();</h1>
+
+<pre><code>这种语句在碰到条件语句的时候容易出错：
+</code></pre>
+
+<p>if (flag)
+    WARN_AND_LOG()
+else
+    //do sth. else
+<code>
+它的展开是
+</code>
+if (flag)
+    warn(); log();
+else
+    //do sth. else
+<code>
+条件控制完全失效了
+这种情况一般使用 do while 语句，防止出现意料之外的问题
+</code></p>
+
+<h1>define WARN_AND_LOG() do { warn(); log();} while(0)</h1>
+
+<pre><code>
+
+### 实例，通过宏来实现灵活的代码 ###
+&gt; 需求
+&gt; 扩展NSLog()的功能，以使它能打印出更多信息，确定文件行号方法等
+
+首先我们要知道，在预编译时，编译器为我们指定了一些内置的宏(\__FILE__，\__func__，\__LINE__)，分别对应文件、方法和行号，像NSLog这种应用广泛的宏，最好能少改动其他文件的代码部分。那么，最终只要在项目的预编译pch文件里加上下面的代码：
+</code></pre>
+
+<h1>define NSLog(format, &hellip;) do {                                                                             \</h1>
+
+<pre><code>fprintf(stderr, "&lt;%s : %d&gt; %s\n",                                                                    \
+        [[[NSString stringWithUTF8String:__FILE__] lastPathComponent] UTF8String],                                                      \
+        __LINE__, __func__);                                                        \
+NSLog((format), ##__VA_ARGS__);                                           \
+fprintf(stderr,"-------\n");                                              \
+</code></pre>
+
+<p>} while (0)
+```</p>
+]]></content>
+  </entry>
+  
+</feed>
